@@ -1,5 +1,4 @@
 import requests
-import json
 
 # Referências sobre o uso do requests:
 #
@@ -11,22 +10,28 @@ import json
 def version_exists(package_name, version):
     # TODO
     # Fazer requisição na API do PyPI para checar se a versão existe
-    r = requests.get(f"https://pypi.org/pypi/{package_name}/{version}/json")
-    #response = r.json()
-    if r.status_code == 200:
-        return True
-    else:
+    base_url = "https://pypi.org/pypi"
+    url = f'{base_url}/{package_name}/{version}/json'
+
+    response = requests.get(url)
+    if response.status_code == 404:
         return False
+
+    return True
 
 
 def latest_version(package_name):
     # TODO
     # Fazer requisição na API do PyPI para descobrir a última versão
     # de um pacote. Retornar None se o pacote não existir.
+    base_url = "https://pypi.org/pypi"
+    url = f'{base_url}/{package_name}/json'
 
-    r = requests.get(f"https://pypi.org/pypi/{package_name}/json")
-    if r.status_code == 404:
-        return "None"
-    else:
-        r = r.json()
-        return list(r['releases'].keys())[-1]
+    response = requests.get(url)
+    if response.status_code == 404:
+        return None
+    
+    response = response.json()
+    version = response['info']['version']
+    
+    return version
